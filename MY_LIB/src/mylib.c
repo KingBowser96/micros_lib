@@ -10,6 +10,7 @@ int i2c_write_reg(int fd,unsigned char reg,unsigned char data)
         return write(fd,buf,sizeof buf);
 }
 
+//usada pra escrever no arquivo
 // como usar:
 // pputs( "path" , "1" );
 // ou
@@ -28,6 +29,7 @@ int pputs(const char path[],const char s[])
 	return n;
 }
 
+// usada pra ler do arquivo e coloca no s
 // como usar:
 // pgets( str , sizeof str , "path" );
 char *pgets(char *s,int size,const char path[])
@@ -37,13 +39,18 @@ char *pgets(char *s,int size,const char path[])
 	if((fd=open(path,O_RDONLY)) ==-1)
 		return NULL;
 	
-	read(fd,s,size);
+	if (read(fd,s,size) < 0)
+		{
+			printf("Erro no read\n");
+			return 0;
+		}
 	close(fd);
 	return s;
 }
 
 // ajusta o servo motor para o angulo desejado
 // -90º < angle < 90º
+// retorna 0 se sucesso, -1 se erro
 int servoAngle(double angle)
 {
 	int duty_cycle;
@@ -71,10 +78,13 @@ int servoAngle(double angle)
 	pputs("/sys/class/pwm/pwmchip0/pwm1/duty_cycle",str);
 	
 	pputs("/sys/class/pwm/pwmchip0/pwm1/enable","1");
+	
+	return 0;
 }
 
+// le o valor do A0
 // função para ler o valor de um potenciometro utilizando ADC one-shot
-// retorna o valor em Volts (double)
+// retorna o valor em Volts (double), -1 se erro
 double readOneShot()
 {
 	int fd;
@@ -95,7 +105,8 @@ double readOneShot()
 	
 	// lê o valor bruto
 	lseek(fd,0,SEEK_SET);
-	read(fd,data_str,sizeof data_str);
+	if(read(fd,data_str,sizeof data_str) < 0)
+		return -1;
 	raw = atoi(data_str);
 	
 	// mostra o valor bruto, o fator de escala e o valor final
@@ -118,7 +129,6 @@ int readContinuous()
 	static struct sensors data[DATA_POINTS];
 	int i;
 	int samples;
-	FILE *file;
 	char path_str[80];
 	
 	// desativa o buffer
@@ -214,12 +224,11 @@ int readContinuous()
 					data[i].temp*scale[3],
 					(data[i].timestamp-data[0].timestamp)*1e-9);
 	}
-	fclose(file);
 	
 	return 0;
 }
 
-
+// manda as duas strings e escreve em cada linha
 // função para escrever nas duas linhas do LCD
 void writeLCD(const char *line1, const char *line2)
 {

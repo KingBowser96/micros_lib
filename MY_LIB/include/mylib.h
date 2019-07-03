@@ -12,9 +12,9 @@
 #include <string.h>
 
 // libs que estão no include
-#include <i2cutil.h>
-#include <galileo2io.h>
-#include <jhdlcd.h>
+#include "i2cutil.h"
+#include "galileo2io.h"
+#include "jhdlcd.h"
 
 //-----------------------------------------------------------------
 

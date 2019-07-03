@@ -1,8 +1,8 @@
-TARGET = blink
-SRCS = $(TARGET).c mylib.c
+TARGET = ./src/prova
+SRCS = $(TARGET).c ./src/mylib.c
 
 FLAGS=-O2 -Wall -g -MMD
-INCLUDE=
+INCLUDE=-I /include
 LIBDIR=
 LIBS=
 
@@ -20,8 +20,8 @@ $(TARGET): $(SRCS:.c=.o)
 
 -include $(SRCS:.c=.d)
 
-clean:
-	rm -f *~ *.bak *.o *.d
-
-distclean: clean
+clean: distclean
 	rm -f $(TARGET)
+
+distclean: 
+	rm -f *~ *.bak ./src/*.o ./src/*.d
